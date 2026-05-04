@@ -6,9 +6,9 @@ from K_means_clustering import K_means_clustering
 from K_means_clustering import fxdist
 import matplotlib.pyplot as plt
 
-# Load data
+# load data
 data = loadmat("A2_data.mat")
-print(data.keys())
+#print(data.keys())
 X_train = data["train_data_01"]# shape 784X12665 i.e 784 features and 12665 samples 
 y_train = data["train_labels_01"]
 X_test= data["test_data_01"]
@@ -42,6 +42,7 @@ y,c = K_means_clustering(X_train,K)
 #print(c.shape) c:(784,K) is the mean of all data points in that cluster 
 marker = ['o','x','s','^','v']
 plt.figure(figsize=(8,6))
+
 def Kmeans_plot (cluster):
     for k in range(K):
         Zk = Z[y == k] # Making a mask, true for every datapoint where y==k, i.e each datapoint beloing to cluster k. zk only data points for this cluster 
@@ -57,6 +58,8 @@ def Kmeans_plot (cluster):
     plt.show()
 
 #Kmeans_plot(K)
+
+## Plot for images from centroids ###
 
 def plot_centroids(C, K, title):
     plt.figure(figsize=(10, 3))
@@ -74,31 +77,26 @@ def plot_centroids(C, K, title):
 
 #plot_centroids(c,K,"Centroid images reconstructed using PCA")
 
+### for exercise 10####
+
 def assign_cluster_labels(y_clusters, true_labels, K):
     cluster_labels = np.zeros(K)
 
     for k in range(K):
         labels_in_cluster = true_labels[y_clusters == k].flatten()
-        cluster_labels[k] = np.bincount(labels_in_cluster).argmax()
+        cluster_labels[k] = np.bincount(labels_in_cluster).argmax() # fins the largest
 
     return cluster_labels
 
-
 def K_means_classifier(x, C, cluster_labels):
-    d = fxdist(x, C)
+    d = fxdist(x, C) # based on the function in K_means _clustering
     k = np.argmin(d)
     return cluster_labels[k]
 
-
 K = 2
-
-# -----------------------
-# TRAIN CLUSTERING
-# -----------------------
+# Train 
 y_train_clusters, C = K_means_clustering(X_train, K)
-
 cluster_labels = assign_cluster_labels(y_train_clusters, y_train, K)
-
 y_train_flat = y_train.flatten()
 N_train = X_train.shape[1]
 
@@ -108,8 +106,7 @@ y_train_pred = np.array([
     for i in range(N_train)
 ])
 
-print("\n--- TRAINING STATS ---")
-
+print("Training")
 for k in range(K):
     mask = (y_train_clusters == k)
     labels_in_cluster = y_train_flat[mask]
@@ -120,21 +117,17 @@ for k in range(K):
     assigned_class = np.bincount(labels_in_cluster).argmax()
     misclassified = np.sum(labels_in_cluster != assigned_class)
 
-    print(f"\nCluster {k+1}")
+    print(f"Cluster {k+1}")
     print(f"# '0': {count_0}")
     print(f"# '1': {count_1}")
     print(f"Assigned class: {assigned_class}")
-    print(f"# misclassified: {misclassified}")
+    print(f"misclassified: {misclassified}")
 
 train_error = np.mean(y_train_pred != y_train_flat)
+print("N_train =", N_train)
+print("Misclassification rate:", train_error * 100)
 
-print("\nN_train =", N_train)
-print("Misclassification rate (%):", train_error * 100)
-
-
-# -----------------------
-# TEST CLUSTERING
-# -----------------------
+# Test 
 y_test_flat = y_test.flatten()
 N_test = X_test.shape[1]
 
@@ -148,8 +141,7 @@ y_test_pred = np.array([
     for i in range(N_test)
 ])
 
-print("\n--- TEST STATS ---")
-
+print("Test")
 for k in range(K):
     mask = (y_test_clusters == k)
     labels_in_cluster = y_test_flat[mask]
@@ -164,13 +156,12 @@ for k in range(K):
         assigned_class = None
         misclassified = 0
 
-    print(f"\nCluster {k+1}")
+    print(f"Cluster {k+1}")
     print(f"# '0': {count_0}")
     print(f"# '1': {count_1}")
     print(f"Assigned class: {assigned_class}")
-    print(f"# misclassified: {misclassified}")
+    print(f" misclassified: {misclassified}")
 
 test_error = np.mean(y_test_pred != y_test_flat)
-
 print("\nN_test =", N_test)
-print("Misclassification rate (%):", test_error * 100)
+print("Misclassification rate:", test_error * 100)
