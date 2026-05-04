@@ -4,7 +4,6 @@ from scipy.io import loadmat
 from sklearn.decomposition import PCA
 from K_means_clustering import K_means_clustering
 from K_means_clustering import fxdist
-import matplotlib.pyplot as plt
 
 # load data
 data = loadmat("A2_data.mat")
