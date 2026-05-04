@@ -31,50 +31,26 @@ def K_means_clustering(X, K):
     for i in range(intermax):
     # Step 1
         y = step_assign_cluster(X, C)
-
     # Step 2
         C_new, movement = step_compute_mean(X, y, C)
-
         C = C_new
 
         if movement < conv_tol:
             break
-
     return y, C
 
 def step_assign_cluster(X, C):
-    """
-    Assign each sample to the closest centroid.
 
-    Parameters:
-    - X: (D, N)
-    - C: (D, K)
-
-    Returns:
-    - y: (N,) cluster assignments
-    """
     N = X.shape[1]
     y = np.zeros(N, dtype=int) 
 
     for n in range(N):
         d = fxdist(X[:, n], C)
-        y[n] = np.argmin(d)# gives the index where the samllest index is. d is (K,) i.e idex of cluster
+        y[n] = np.argmin(d)# gives the index where the samllest index is. d is (K,) i.e index of cluster
 
     return y
 
 def step_compute_mean(X, y, C):
-    """
-    Compute new centroids and how much they moved.
-
-    Parameters:
-    - X: (D, N)
-    - y: (N,)
-    - C: (D, K)
-
-    Returns:
-    - C_new: (D, K)
-    - movement: scalar (max centroid shift)
-    """
     D, K = C.shape
     C_new = np.zeros((D, K))
 
