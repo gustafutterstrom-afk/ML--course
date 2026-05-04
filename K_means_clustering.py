@@ -29,35 +29,83 @@ def K_means_clustering(X, K):
     Cold = C.copy()
 
     for i in range(intermax):
-        # Step 1: Assign to clusters
-        y = []
+    # Step 1
+        y = step_assign_cluster(X, C)
 
-        # Step 2: Assign new clusters
-        C = []
+    # Step 2
+        C_new, movement = step_compute_mean(X, y, C)
 
-        if fcdist(C, Cold) < conv_tol:
-            return y, C
+        C = C_new
 
-        Cold = C.copy()
+        if movement < conv_tol:
+            break
 
     return y, C
 
+def step_assign_cluster(X, C):
+    """
+    Assign each sample to the closest centroid.
+
+    Parameters:
+    - X: (D, N)
+    - C: (D, K)
+
+    Returns:
+    - y: (N,) cluster assignments
+    """
+    N = X.shape[1]
+    y = np.zeros(N, dtype=int) 
+
+    for n in range(N):
+        d = fxdist(X[:, n], C)
+        y[n] = np.argmin(d)# gives the index where the samllest index is. d is (K,) i.e idex of cluster
+
+    return y
+
+def step_compute_mean(X, y, C):
+    """
+    Compute new centroids and how much they moved.
+
+    Parameters:
+    - X: (D, N)
+    - y: (N,)
+    - C: (D, K)
+
+    Returns:
+    - C_new: (D, K)
+    - movement: scalar (max centroid shift)
+    """
+    D, K = C.shape
+    C_new = np.zeros((D, K))
+
+    for k in range(K):
+        cluster_points = X[:, y == k]
+
+        if cluster_points.shape[1] > 0:
+            C_new[:, k] = np.mean(cluster_points, axis=1)
+        else:
+            C_new[:, k] = C[:, k]  # keep old centroid
+
+    movement = np.max(fcdist(C_new, C))
+
+    return C_new, movement
+
 def fxdist(x,C):
     # CHANGE
-    d = None
+    d = np.linalg.norm(C-x[:,None],axis=0) # since x:(D,) and C:(D,K) 
     # DO NOT CHANGE
     return d
 
 def fcdist(C1,C2):
     # CHANGE
-    d = None
+    d = np.linalg.norm(C1-C2,axis=0)#since C:(D,K) and C:(D,K) d:(K,)
     # DO NOT CHANGE
     return d
 
 
 def load_data():
     # Replace '/path/to/file/' with the path to your .mat file
-    base_path = "/path/to/file/"
+    base_path = "/Users/gustafutterstrom/Desktop/Utbildning/Progg/ClonedRepos/ML--course/"
     mat_file_path = base_path + "A2_data.mat"
     try:
         mat_data = scipy.io.loadmat(mat_file_path)
